@@ -40,8 +40,27 @@ function makeHabit() {
   return {
     id: `habit-${Date.now()}-${Math.random().toString(16).slice(2)}`,
     behavior: '',
-    frequency: '',
+    when: '',
+    location: '',
+    reason: '',
   };
+}
+
+/* Mirrors HabitSentenceField on CreateHabitPage so the wording and placement
+ * stay identical to the standalone "New Habit" flow. */
+function HabitSentenceField({ label, placeholder, value, onChange }) {
+  return (
+    <label className="create-goal-habit-field">
+      <span className="create-goal-habit-field__label">{label}</span>
+      <input
+        className="create-goal-habit-field__input"
+        type="text"
+        value={value}
+        placeholder={placeholder}
+        onChange={onChange}
+      />
+    </label>
+  );
 }
 
 const isPositiveNumber = (value) => {
@@ -312,25 +331,38 @@ export function CreateGoalPage({ onNavigate }) {
 
                       <div className="create-goal-habits">
                         {subgoal.habits.map((habit) => (
-                          <div className="create-goal-habit-row" key={habit.id}>
-                            <span className="create-goal-habit-row__prefix">I will</span>
-                            <Input
-                              size="sm"
-                              placeholder="Ex: read 20 pages"
-                              value={habit.behavior}
-                              onChange={(event) => updateHabit(subgoal.id, habit.id, 'behavior', event.target.value)}
-                              style={{ flex: '2 1 160px' }}
-                            />
-                            <Input
-                              size="sm"
-                              type="number"
-                              min="0"
-                              placeholder="times"
-                              value={habit.frequency}
-                              onChange={(event) => updateHabit(subgoal.id, habit.id, 'frequency', event.target.value)}
-                              style={{ flex: '0 0 96px' }}
-                            />
-                            <span className="create-goal-habit-row__prefix">× / week</span>
+                          <div className="create-goal-habit" key={habit.id}>
+                            <div className="create-goal-habit-sentence">
+                              <span className="create-goal-habit-sentence__text">I will</span>
+                              <HabitSentenceField
+                                label="Behavior"
+                                placeholder="Ex: read"
+                                value={habit.behavior}
+                                onChange={(event) => updateHabit(subgoal.id, habit.id, 'behavior', event.target.value)}
+                              />
+                              <span className="create-goal-habit-sentence__text">,</span>
+                              <HabitSentenceField
+                                label="Time / when"
+                                placeholder="Ex: after breakfast"
+                                value={habit.when}
+                                onChange={(event) => updateHabit(subgoal.id, habit.id, 'when', event.target.value)}
+                              />
+                              <span className="create-goal-habit-sentence__text">in</span>
+                              <HabitSentenceField
+                                label="Location"
+                                placeholder="Ex: the kitchen"
+                                value={habit.location}
+                                onChange={(event) => updateHabit(subgoal.id, habit.id, 'location', event.target.value)}
+                              />
+                              <span className="create-goal-habit-sentence__text">to</span>
+                              <HabitSentenceField
+                                label="Reason"
+                                placeholder="Ex: to become wiser"
+                                value={habit.reason}
+                                onChange={(event) => updateHabit(subgoal.id, habit.id, 'reason', event.target.value)}
+                              />
+                              <span className="create-goal-habit-sentence__text">.</span>
+                            </div>
                             <IconButton
                               type="button"
                               label="Remove habit"

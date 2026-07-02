@@ -12,6 +12,16 @@
   gap: var(--space-6);
 }
 
+.goals-checkin {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.goals-section-title {
+  color: var(--text-primary);
+}
+
 .goals-hold-tracker {
   --hold-pct: 0%;
   --hold-fill: color-mix(in srgb, var(--goal) 28%, transparent);
@@ -156,6 +166,83 @@
   color: var(--text-primary);
 }
 
+/* Contribution tracker (GitHub-style check-in grid) ----------------------- */
+.goals-tracker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.goals-tracker__heading {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.goals-tracker__count {
+  color: var(--text-tertiary);
+  font-size: var(--fs-body-sm);
+}
+
+/* Grid stretches to fill the full width of the card. */
+.goals-tracker__grid {
+  display: flex;
+  gap: 4px;
+  width: 100%;
+}
+
+.goals-tracker__week {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.goals-tracker__cell {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 3px;
+  background: var(--surface-inset);
+  border: 1px solid var(--border-subtle);
+}
+
+/* Legend swatches keep a fixed size regardless of the stretched grid. */
+.goals-tracker__legend .goals-tracker__cell {
+  width: 12px;
+  height: 12px;
+  aspect-ratio: auto;
+  flex: 0 0 auto;
+}
+
+.goals-tracker__cell[data-level="1"] {
+  background: color-mix(in srgb, var(--goal) 28%, transparent);
+  border-color: transparent;
+}
+
+.goals-tracker__cell[data-level="2"] {
+  background: color-mix(in srgb, var(--goal) 52%, transparent);
+  border-color: transparent;
+}
+
+.goals-tracker__cell[data-level="3"] {
+  background: color-mix(in srgb, var(--goal) 76%, transparent);
+  border-color: transparent;
+}
+
+.goals-tracker__cell[data-level="4"] {
+  background: var(--goal);
+  border-color: transparent;
+}
+
+.goals-tracker__legend {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-tertiary);
+  font-size: var(--fs-caption);
+}
+
 .goals-screen__grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -170,17 +257,85 @@
   margin-bottom: 14px;
 }
 
-.goals-habits {
+/* List of goals (scrollable) --------------------------------------------- */
+.goals-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 4px;
+  max-height: 340px;
+  overflow-y: auto;
+  padding-right: var(--space-1);
+}
+
+.goals-list-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.goals-list-row:hover {
+  background: var(--surface-inset);
+}
+
+.goals-list-row__icon {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  background: var(--goal-subtle);
+  color: var(--goal);
+}
+
+.goals-list-row__copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.goals-list-row__title {
+  color: var(--text-primary);
+  font-size: var(--fs-body-md);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-tight);
+}
+
+.goals-list-row__sub {
+  margin-top: 1px;
+  color: var(--text-tertiary);
+  font-size: var(--fs-body-sm);
+}
+
+.goals-list-row__pct {
+  flex: 0 0 auto;
+  color: var(--text-secondary);
+  font-size: var(--fs-body-sm);
+  font-weight: var(--fw-bold);
 }
 
 .goals-roadmap-header {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  gap: var(--space-3);
   margin-bottom: 16px;
+}
+
+.goals-roadmap-header__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Roadmap (scrollable) --------------------------------------------------- */
+.goals-roadmap-list {
+  max-height: 340px;
+  overflow-y: auto;
+  padding-right: var(--space-1);
 }
 
 .goals-milestone {
