@@ -1,0 +1,6 @@
+<svg width="220" height="48" viewBox="0 0 220 48" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Do Better">
+  <rect width="48" height="48" rx="13" fill="#16A86A"></rect>
+  <path d="M11 26 L20 35 L33 16" stroke="#FFFFFF" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M33 16 L33 24 M33 16 L25 16" stroke="#FFFFFF" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"></path>
+  <text x="62" y="33" font-family="'Bricolage Grotesque','Plus Jakarta Sans',sans-serif" font-size="27" font-weight="800" letter-spacing="-0.5" fill="#1C1A16">Do Better</text>
+</svg>

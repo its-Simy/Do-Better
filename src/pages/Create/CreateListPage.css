@@ -1,0 +1,66 @@
+.create-list-screen {
+  flex: 1;
+  overflow: auto;
+  padding: var(--space-8);
+}
+
+.create-list-screen__content {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.create-list-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.create-list-components {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.create-list-components__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.create-list-components__rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.create-list-component-row {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+
+.create-list-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding-top: var(--space-2);
+}
+
+@media (max-width: 620px) {
+  .create-list-screen {
+    padding: var(--space-6);
+  }
+
+  .create-list-component-row {
+    align-items: stretch;
+  }
+
+  .create-list-actions {
+    flex-direction: column-reverse;
+  }
+
+  .create-list-actions > button {
+    width: 100%;
+  }
+}

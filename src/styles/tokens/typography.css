@@ -1,0 +1,44 @@
+/* Do Better — Typography tokens
+ * Display: Bricolage Grotesque (characterful, friendly, modern)
+ * UI / Body: Plus Jakarta Sans (rounded, warm, highly legible)
+ * Data / Numbers: JetBrains Mono (tabular figures for trackers & stats)
+ */
+
+:root {
+  --font-display: 'Bricolage Grotesque', 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-sans:    'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* Type scale (rem @ 16px root) */
+  --fs-display-2xl: 3.5rem;   /* 56 */
+  --fs-display-xl:  2.75rem;  /* 44 */
+  --fs-display-lg:  2.25rem;  /* 36 */
+  --fs-title-lg:    1.75rem;  /* 28 */
+  --fs-title-md:    1.375rem; /* 22 */
+  --fs-title-sm:    1.125rem; /* 18 */
+  --fs-body-lg:     1.0625rem;/* 17 */
+  --fs-body-md:     0.9375rem;/* 15 */
+  --fs-body-sm:     0.875rem; /* 14 */
+  --fs-label:       0.8125rem;/* 13 */
+  --fs-caption:     0.75rem;  /* 12 */
+
+  /* Weights */
+  --fw-regular:  400;
+  --fw-medium:   500;
+  --fw-semibold: 600;
+  --fw-bold:     700;
+  --fw-extrabold:800;
+
+  /* Line heights */
+  --lh-tight:   1.1;
+  --lh-snug:    1.25;
+  --lh-normal:  1.5;
+  --lh-relaxed: 1.65;
+
+  /* Letter spacing */
+  --ls-tight:  -0.02em;
+  --ls-snug:   -0.01em;
+  --ls-normal: 0;
+  --ls-wide:   0.04em;
+  --ls-caps:   0.08em;
+}

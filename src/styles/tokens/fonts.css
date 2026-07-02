@@ -1,0 +1,7 @@
+/* Do Better — Webfonts
+ * NOTE: No brand font files were provided, so these are loaded from Google Fonts.
+ * Bricolage Grotesque (display) + Plus Jakarta Sans (body/UI) + JetBrains Mono (data).
+ * If you have licensed/self-hosted font binaries, replace these @import lines with
+ * local @font-face rules pointing at the woff2 files.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
