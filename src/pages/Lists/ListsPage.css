@@ -154,6 +154,20 @@
   cursor: default !important;
 }
 
+.tasks-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-8) !important;
+  text-align: center;
+}
+
+.tasks-empty__copy {
+  color: var(--text-secondary);
+  font-size: var(--fs-body-md);
+}
+
 @media (max-width: 680px) {
   .tasks-screen__toolbar {
     align-items: stretch;

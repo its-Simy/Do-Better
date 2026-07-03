@@ -2,7 +2,7 @@ export const initialLists = [
   {
     id: 'work',
     name: 'Work',
-    color: 'var(--brand)',
+    color: 'sprout',
     collapsed: {},
     tasks: [
       { id: 'w1', title: 'Ship Q3 roadmap', hasChildren: true },
@@ -15,7 +15,7 @@ export const initialLists = [
   {
     id: 'life',
     name: 'Personal',
-    color: 'var(--goal)',
+    color: 'honey',
     collapsed: {},
     tasks: [
       { id: 'l1', title: 'Half-marathon block', hasChildren: true },

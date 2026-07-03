@@ -1,9 +1,11 @@
 import React from 'react';
-import { Card, Button, Icon, Select, ProgressBar } from '../../components';
+import { Card, Button, Icon, Select, ProgressBar, ProgressRing } from '../../components';
 import { useHoldToFill } from '../../hooks/useHoldToFill.js';
+import { useSettings } from '../../state/SettingsContext.jsx';
 import './GoalsPage.css';
 
-/* Do Better — Goals screen: goal breakdown → habits → roadmap, with "good enough" target */
+/* Do Better — Goals screen: goal breakdown → habits → roadmap, with "good enough" target.
+ * The check-in widget and per-goal progress render per the Goals & Sleep settings. */
 
 function AiNote({ children }) {
   return (
@@ -89,12 +91,107 @@ function buildContributions(weeks) {
   ));
 }
 
-function ContributionTracker() {
+const DAY_LABELS = {
+  monday: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+  sunday: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+};
+const LABELED_DAYS = ['Mon', 'Wed', 'Fri'];
+
+function ActivityHeatmap({ weeks, weekStart }) {
+  const dayLabels = DAY_LABELS[weekStart] || DAY_LABELS.monday;
+  return (
+    <>
+      <div className="goals-tracker__frame">
+        <div className="goals-tracker__days" aria-hidden="true">
+          {dayLabels.map((day) => (
+            <span key={day} className="goals-tracker__day-label">
+              {LABELED_DAYS.includes(day) ? day : ''}
+            </span>
+          ))}
+        </div>
+        <div className="goals-tracker__grid">
+          {weeks.map((week, wi) => (
+            <div className="goals-tracker__week" key={wi}>
+              {week.map((level, di) => (
+                <span
+                  key={di}
+                  className="goals-tracker__cell"
+                  data-level={level}
+                  title={`${dayLabels[di]} · wk ${wi + 1} · ${level === 0 ? 'no check-ins' : `level ${level}`}`}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="goals-tracker__legend">
+        <span>Less</span>
+        {[0, 1, 2, 3, 4].map((level) => (
+          <span key={level} className="goals-tracker__cell" data-level={level} />
+        ))}
+        <span>More</span>
+      </div>
+    </>
+  );
+}
+
+function ActivityBars({ weeklyActive }) {
+  return (
+    <>
+      <div className="goals-activity-plot">
+        {weeklyActive.map((days, index) => (
+          <div className="goals-activity-plot__col" key={index} title={`Week ${index + 1} · ${days} active ${days === 1 ? 'day' : 'days'}`}>
+            <span className="goals-activity-bar" style={{ height: `${(days / 7) * 100}%` }} />
+          </div>
+        ))}
+      </div>
+      <div className="goals-tracker__legend">
+        <span>Active days per week · 0–7 · past year</span>
+      </div>
+    </>
+  );
+}
+
+function ActivityLine({ weeklyActive }) {
+  const last = weeklyActive.length - 1;
+  const x = (index) => 1 + (index / last) * 98;
+  const y = (days) => 6 + (1 - days / 7) * 88;
+  const lineD = weeklyActive.map((days, index) => `${index === 0 ? 'M' : 'L'} ${x(index).toFixed(2)} ${y(days).toFixed(2)}`).join(' ');
+  const areaD = `${lineD} L 99 94 L 1 94 Z`;
+
+  return (
+    <>
+      <div className="goals-activity-plot goals-activity-plot--line">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <path d={areaD} fill="color-mix(in srgb, var(--goal) 13%, transparent)" stroke="none" />
+          <path d={lineD} fill="none" stroke="var(--goal)" strokeWidth="2" vectorEffect="non-scaling-stroke" strokeLinejoin="round" strokeLinecap="round" />
+        </svg>
+        <span
+          className="goals-activity-line-dot"
+          style={{ left: `${x(last)}%`, top: `${y(weeklyActive[last])}%` }}
+          title={`This week · ${weeklyActive[last]} active days`}
+        />
+        <div className="goals-activity-plot__hover">
+          {weeklyActive.map((days, index) => (
+            <span key={index} title={`Week ${index + 1} · ${days} active ${days === 1 ? 'day' : 'days'}`} />
+          ))}
+        </div>
+      </div>
+      <div className="goals-tracker__legend">
+        <span>Active days per week · 0–7 · past year</span>
+      </div>
+    </>
+  );
+}
+
+function ContributionTracker({ variant, weekStart }) {
   const [scope, setScope] = React.useState('all');
   const weeks = React.useMemo(() => buildContributions(TRACKER_WEEKS), []);
-  const activeDays = weeks.reduce((total, week) => (
-    total + week.filter((level) => level > 0).length
-  ), 0);
+  const weeklyActive = React.useMemo(
+    () => weeks.map((week) => week.filter((level) => level > 0).length),
+    [weeks],
+  );
+  const activeDays = weeklyActive.reduce((total, count) => total + count, 0);
 
   return (
     <Card padding="lg">
@@ -112,22 +209,9 @@ function ContributionTracker() {
         />
       </div>
       <div className="goals-tracker">
-        <div className="goals-tracker__grid">
-          {weeks.map((week, wi) => (
-            <div className="goals-tracker__week" key={wi}>
-              {week.map((level, di) => (
-                <span key={di} className="goals-tracker__cell" data-level={level} />
-              ))}
-            </div>
-          ))}
-        </div>
-        <div className="goals-tracker__legend">
-          <span>Less</span>
-          {[0, 1, 2, 3, 4].map((level) => (
-            <span key={level} className="goals-tracker__cell" data-level={level} />
-          ))}
-          <span>More</span>
-        </div>
+        {variant === 'bar' && <ActivityBars weeklyActive={weeklyActive} />}
+        {variant === 'line' && <ActivityLine weeklyActive={weeklyActive} />}
+        {variant !== 'bar' && variant !== 'line' && <ActivityHeatmap weeks={weeks} weekStart={weekStart} />}
       </div>
     </Card>
   );
@@ -163,7 +247,7 @@ function Milestone({ done, active, title, sub }) {
 
 /* Each goal carries its own roadmap — the subgoals it breaks down into,
  * ordered from done → active → upcoming. */
-const GOALS_LIST = [
+export const GOALS_LIST = [
   {
     name: 'Read 12 books', sub: 'Become wiser / analytical', value: 66, target: 75,
     roadmap: [
@@ -222,7 +306,8 @@ const GOALS_LIST = [
 
 const GOAL_SCOPES = GOALS_LIST.map((goal) => ({ value: goal.name, label: goal.name }));
 
-function GoalListRow({ name, sub, value, target }) {
+function GoalListRow({ name, sub, value, target, progressStyle, showTargets }) {
+  const asRing = progressStyle === 'ring';
   return (
     <div className="goals-list-row">
       <span className="goals-list-row__icon">
@@ -231,9 +316,21 @@ function GoalListRow({ name, sub, value, target }) {
       <div className="goals-list-row__copy">
         <div className="goals-list-row__title">{name}</div>
         <div className="goals-list-row__sub">{sub}</div>
-        <ProgressBar value={value} target={target} color="var(--goal)" height={7} style={{ marginTop: 6 }} />
+        {!asRing && (
+          <ProgressBar
+            value={value}
+            target={showTargets ? target : null}
+            color="var(--goal)"
+            height={7}
+            style={{ marginTop: 6 }}
+          />
+        )}
       </div>
-      <span className="db-num goals-list-row__pct">{value}%</span>
+      {asRing ? (
+        <ProgressRing value={value} size={46} thickness={5} color="var(--goal)" label={value} sublabel="%" />
+      ) : (
+        <span className="db-num goals-list-row__pct">{value}%</span>
+      )}
     </div>
   );
 }
@@ -241,6 +338,8 @@ function GoalListRow({ name, sub, value, target }) {
 export function GoalsPage({ onNavigate }) {
   const [roadmapGoal, setRoadmapGoal] = React.useState(GOALS_LIST[0].name);
   const selectedGoal = GOALS_LIST.find((goal) => goal.name === roadmapGoal) || GOALS_LIST[0];
+  const { settings } = useSettings();
+  const goalSettings = settings.goals;
 
   return (
     <div className="goals-screen">
@@ -250,11 +349,16 @@ export function GoalsPage({ onNavigate }) {
           <GoalHoldTracker />
         </div>
 
-        <AiNote>
-          <strong>How this moves the needle.</strong> Your “Run 3× / week” habit is the biggest driver — at the current pace you’ll clear a 16 km long run by week 7, hitting <em>good enough</em> 9 days before race day. Missing more than one run a week is the main risk.
-        </AiNote>
+        {goalSettings.showInsights && (
+          <AiNote>
+            <strong>How this moves the needle.</strong> Your “Run 3× / week” habit is the biggest driver — at the current pace you’ll clear a 16 km long run by week 7, hitting <em>good enough</em> 9 days before race day. Missing more than one run a week is the main risk.
+          </AiNote>
+        )}
 
-        <ContributionTracker />
+        <ContributionTracker
+          variant={goalSettings.activityChart}
+          weekStart={settings.general.weekStart}
+        />
 
         <div className="goals-screen__grid">
           {/* List of goals */}
@@ -272,7 +376,12 @@ export function GoalsPage({ onNavigate }) {
             </div>
             <div className="goals-list">
               {GOALS_LIST.map((goal) => (
-                <GoalListRow key={goal.name} {...goal} />
+                <GoalListRow
+                  key={goal.name}
+                  {...goal}
+                  progressStyle={goalSettings.progressStyle}
+                  showTargets={goalSettings.showTargets}
+                />
               ))}
             </div>
           </Card>

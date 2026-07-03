@@ -64,6 +64,15 @@
   --danger-500:  #E5484D;
   --danger-600:  #C62A2F;
   --info-500:    #5B72CE;
+
+  /* ---- List identity colors ----
+   * One fixed set for both themes so a list keeps the exact same color
+   * everywhere. Steps chosen to pass CVD-separation + contrast validation
+   * on light and dark surfaces; always shown beside the list's name. */
+  --list-sprout: var(--sprout-500);
+  --list-honey:  var(--honey-600);
+  --list-dusk:   var(--dusk-500);
+  --list-ember:  var(--ember-600);
 }
 
 /* ============ Semantic aliases — LIGHT (default) ============ */

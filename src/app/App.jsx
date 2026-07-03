@@ -2,7 +2,39 @@ import React from 'react';
 import { AppShell, TopBar } from '../layout/AppShell.jsx';
 import { Button, Icon } from '../components';
 import { StartPage } from '../pages/Start/StartPage.jsx';
+import { GOALS_LIST } from '../pages/Goals/GoalsPage.jsx';
+import { SettingsProvider } from '../state/SettingsContext.jsx';
+import { ListsProvider, useLists } from '../state/ListsContext.jsx';
 import { APP_ROUTES, PRIMARY_ROUTE_IDS } from './routes.js';
+
+/* Inside the providers so the sidebar badges track the real list count. */
+function AppChrome({ active, onNavigate, themePreference, onThemePreferenceChange }) {
+  const { lists } = useLists();
+  const route = APP_ROUTES[active];
+  const Screen = route?.component;
+
+  return (
+    <AppShell
+      active={active} onNavigate={onNavigate}
+      counts={{ lists: lists.length, goals: GOALS_LIST.length }}
+    >
+      <TopBar title={route.title} subtitle={route.subtitle} actions={
+        <Button
+          variant="primary"
+          iconLeft={<Icon name="plus" size={16} />}
+          onClick={() => onNavigate('create')}
+        >
+          New
+        </Button>
+      } />
+      <Screen
+        onNavigate={onNavigate}
+        themePreference={themePreference}
+        onThemePreferenceChange={onThemePreferenceChange}
+      />
+    </AppShell>
+  );
+}
 
 export function App() {
   const [active, setActive] = React.useState('start');
@@ -32,22 +64,7 @@ export function App() {
     return () => cancelAnimationFrame(id);
   }, [dark]);
 
-  const route = APP_ROUTES[active];
-  const Screen = route?.component;
   const startOptions = PRIMARY_ROUTE_IDS.map((id) => ({ id, ...APP_ROUTES[id] }));
-
-  if (active === 'start') {
-    return (
-      <div
-        data-theme={dark ? 'dark' : 'light'}
-        data-hover-highlight="on"
-        data-theme-switching={switching ? '' : undefined}
-        style={{ height: '100%' }}
-      >
-        <StartPage options={startOptions} onNavigate={setActive} />
-      </div>
-    );
-  }
 
   return (
     <div
@@ -56,26 +73,20 @@ export function App() {
       data-theme-switching={switching ? '' : undefined}
       style={{ height: '100%' }}
     >
-      <AppShell
-        active={active} onNavigate={setActive}
-        dark={dark} onToggleDark={(checked) => setThemePreference(checked ? 'dark' : 'light')}
-        counts={{ lists: 6, goals: 3 }}
-      >
-        <TopBar title={route.title} subtitle={route.subtitle} actions={
-          <Button
-            variant="primary"
-            iconLeft={<Icon name="plus" size={16} />}
-            onClick={() => setActive('create')}
-          >
-            New
-          </Button>
-        } />
-        <Screen
-          onNavigate={setActive}
-          themePreference={themePreference}
-          onThemePreferenceChange={setThemePreference}
-        />
-      </AppShell>
+      <SettingsProvider>
+        <ListsProvider>
+          {active === 'start' ? (
+            <StartPage options={startOptions} onNavigate={setActive} />
+          ) : (
+            <AppChrome
+              active={active}
+              onNavigate={setActive}
+              themePreference={themePreference}
+              onThemePreferenceChange={setThemePreference}
+            />
+          )}
+        </ListsProvider>
+      </SettingsProvider>
     </div>
   );
 }

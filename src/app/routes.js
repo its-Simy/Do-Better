@@ -36,7 +36,7 @@ export const APP_ROUTES = {
   },
   settings: {
     title: 'Settings',
-    subtitle: 'Profile, appearance, and notifications',
+    subtitle: 'General, lists, and goals & sleep preferences',
     icon: 'settings',
     component: SettingsPage,
   },

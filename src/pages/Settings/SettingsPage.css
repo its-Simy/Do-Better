@@ -53,7 +53,14 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-6);
-  align-items: start;
+  align-items: stretch;
+}
+
+/* Right column of the General grid: Notifications stacked over Reset. */
+.settings-general-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
 }
 
 .settings-upload-button {
@@ -104,6 +111,80 @@
   font-size: var(--fs-label);
   font-weight: var(--fw-semibold);
   color: var(--text-secondary);
+}
+
+/* Settings rows: label + description left, control right ------------------ */
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  padding: var(--space-3) 0;
+}
+
+.settings-row + .settings-row {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.settings-row.is-disabled {
+  opacity: 0.48;
+  pointer-events: none;
+}
+
+.settings-row__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.settings-row__label {
+  color: var(--text-primary);
+  font-size: var(--fs-body-md);
+  font-weight: var(--fw-semibold);
+}
+
+.settings-row__desc {
+  color: var(--text-tertiary);
+  font-size: var(--fs-body-sm);
+  line-height: 1.45;
+}
+
+.settings-row__control {
+  flex: 0 0 auto;
+}
+
+/* Per-list rows in "Your lists" ------------------------------------------- */
+.settings-list-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+}
+
+.settings-list-row + .settings-list-row {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.settings-list-row__dot {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 auto;
+  border-radius: 3px;
+}
+
+.settings-list-row__name {
+  color: var(--text-primary);
+  font-size: var(--fs-body-md);
+  font-weight: var(--fw-semibold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-empty-copy {
+  color: var(--text-tertiary);
+  font-size: var(--fs-body-sm);
 }
 
 @media (max-width: 760px) {

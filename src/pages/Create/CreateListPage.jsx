@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button, Card, Icon, IconButton, Input } from '../../components';
+import { useLists } from '../../state/ListsContext.jsx';
 import './CreateListPage.css';
 
 const initialComponents = [
@@ -14,6 +15,7 @@ function createComponent() {
 }
 
 export function CreateListPage({ onNavigate }) {
+  const { addList } = useLists();
   const [listName, setListName] = React.useState('');
   const [components, setComponents] = React.useState(initialComponents);
 
@@ -39,6 +41,10 @@ export function CreateListPage({ onNavigate }) {
   const finalizeList = (event) => {
     event.preventDefault();
     if (!canFinalize) return;
+    addList({
+      name: listName,
+      items: components.map((component) => component.title),
+    });
     onNavigate?.('lists');
   };
 

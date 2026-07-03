@@ -6,6 +6,8 @@ export { Input } from './Input.jsx';
 export { Select } from './Select.jsx';
 export { Segmented } from './Segmented.jsx';
 export { Card } from './Card.jsx';
+export { Menu, MenuItem, MenuLabel, MenuSeparator, useMenuClose } from './Menu.jsx';
+export { Swatches } from './Swatches.jsx';
 export { Badge } from './Badge.jsx';
 export { Avatar } from './Avatar.jsx';
 export { ProgressRing } from './ProgressRing.jsx';

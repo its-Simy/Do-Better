@@ -120,3 +120,85 @@ export function moveTaskToEnd(tasks, activeId) {
   const { block, remaining } = getTaskBlock(tasks, activeTask);
   return [...remaining, ...updateBlockParent(block, null)];
 }
+
+/* Moves a task (with its subtasks, when it is a parent) from one list into
+ * another. Childless tasks dropped onto a parent or one of its children join
+ * that parent; everything else lands top-level, after the whole block the
+ * drop target belongs to — never in the middle of another parent's children. */
+export function moveTaskAcrossLists(lists, sourceListId, targetListId, activeTaskId, targetTaskId = null) {
+  const sourceList = lists.find((list) => list.id === sourceListId);
+  const targetList = lists.find((list) => list.id === targetListId);
+  const activeTask = sourceList?.tasks.find((task) => task.id === activeTaskId);
+  if (!sourceList || !targetList || !activeTask || sourceListId === targetListId) return lists;
+
+  const { block, remaining: sourceTasks } = getTaskBlock(sourceList.tasks, activeTask);
+  const targetTask = targetTaskId
+    ? targetList.tasks.find((task) => task.id === targetTaskId)
+    : null;
+
+  let nextParentId = null;
+  if (!activeTask.hasChildren && targetTask) {
+    if (targetTask.parent) nextParentId = targetTask.parent;
+    else if (targetTask.hasChildren) nextParentId = targetTask.id;
+  }
+
+  const blockToMove = updateBlockParent(block, nextParentId);
+
+  const targetTasks = [...targetList.tasks];
+  let insertionIndex = targetTasks.length;
+  if (targetTask) {
+    if (nextParentId && targetTask.id === nextParentId) {
+      insertionIndex = getTopLevelBlockEndIndex(targetTasks, targetTask.id);
+    } else if (nextParentId) {
+      insertionIndex = targetTasks.findIndex((task) => task.id === targetTask.id) + 1;
+    } else {
+      insertionIndex = getTopLevelBlockEndIndex(targetTasks, targetTask.parent || targetTask.id);
+    }
+  }
+  if (insertionIndex < 0) insertionIndex = targetTasks.length;
+
+  targetTasks.splice(insertionIndex, 0, ...blockToMove);
+
+  return lists.map((list) => {
+    if (list.id === sourceListId) return { ...list, tasks: sourceTasks };
+    if (list.id === targetListId) {
+      return {
+        ...list,
+        collapsed: nextParentId ? { ...list.collapsed, [nextParentId]: false } : list.collapsed,
+        tasks: targetTasks,
+      };
+    }
+    return list;
+  });
+}
+
+/* Render-time view of a list's tasks honoring the list display settings.
+ * Completed parents stay visible while any child is still open; sinking
+ * completed items keeps parent/child blocks intact and the manual order
+ * otherwise untouched. */
+export function getVisibleTasks(tasks, { showCompleted = true, completedToBottom = false } = {}) {
+  let visible = tasks;
+
+  if (!showCompleted) {
+    visible = visible.filter((task) => {
+      if (!task.done) return true;
+      return Boolean(task.hasChildren) && tasks.some((child) => child.parent === task.id && !child.done);
+    });
+  }
+
+  if (completedToBottom) {
+    const roots = visible.filter((task) => !task.parent);
+    const orderedRoots = [...roots.filter((root) => !root.done), ...roots.filter((root) => root.done)];
+    const flat = [];
+    orderedRoots.forEach((root) => {
+      const children = visible.filter((task) => task.parent === root.id);
+      flat.push(root, ...children.filter((child) => !child.done), ...children.filter((child) => child.done));
+    });
+    visible.forEach((task) => {
+      if (!flat.includes(task)) flat.push(task);
+    });
+    visible = flat;
+  }
+
+  return visible;
+}

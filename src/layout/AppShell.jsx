@@ -1,5 +1,5 @@
 import React from 'react';
-import { Avatar, Badge, Switch, Icon } from '../components';
+import { Avatar, Badge, Icon } from '../components';
 import { APP_ROUTES } from '../app/routes.js';
 
 /* Do Better — App shell: sidebar nav + topbar with theme controls. */
@@ -40,7 +40,7 @@ function NavItem({ item, active, onClick }) {
   );
 }
 
-export function AppShell({ active, onNavigate, dark, onToggleDark, children, counts = {} }) {
+export function AppShell({ active, onNavigate, children, counts = {} }) {
   const nav = DB_NAV.map((n) => ({ ...n, badge: counts[n.id] }));
   return (
     <div style={{ display: 'flex', height: '100%', background: 'var(--bg-base)' }}>
@@ -77,10 +77,6 @@ export function AppShell({ active, onNavigate, dark, onToggleDark, children, cou
         </nav>
 
         <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 16, borderTop: '1.5px solid var(--border-subtle)' }}>
-          <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, fontSize: 'var(--fs-body-sm)', fontWeight: 600, color: 'var(--text-secondary)', cursor: 'pointer' }}>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}><Icon name={dark ? 'moon' : 'sun'} size={16} /> {dark ? 'Dark' : 'Light'} mode</span>
-            <Switch checked={dark} onChange={onToggleDark} size="sm" />
-          </label>
           <button
             className="db-hoverable"
             type="button"

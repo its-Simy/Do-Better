@@ -81,3 +81,69 @@ component tree.
 Hover glow is a fixed part of the interface, not a user setting. `App` always
 sets `data-hover-highlight="on"`, which lets hoverable components use the shared
 highlight effect without adding another sidebar preference.
+
+## Shared State: Settings and Lists
+
+Two app-level providers live in `src/state/` and wrap everything inside `App`:
+
+- `SettingsContext` — user preferences, persisted to localStorage under
+  `do-better:settings`. Defaults are merged over saved values per section
+  (`general` / `lists` / `goals` / `sleep`), so adding a new setting never
+  breaks an existing save. `updateSetting(section, key, value)` is the only
+  write path; "Reset all settings" restores defaults.
+- `ListsContext` — the lists themselves plus every mutation (toggle, collapse,
+  reorder, cross-list moves, color, delete, add). Deliberately in-memory:
+  reloading restores the demo data. Because lists live at the app level, the
+  Lists page, Settings → Your lists, the create flow, and the sidebar badge
+  all see the same data, and arrangement survives navigation.
+
+## Settings Page Structure
+
+Settings is split into three sections behind a `Segmented` sub-nav: General
+(profile, appearance, time format, week start, notifications, reset), Lists
+(behavior toggles + per-list colors), and Goals & Sleep (widget options for
+those two pages). Every option is a `SettingRow`: label + one-line description
+on the left, control on the right.
+
+## Moving Items Between Lists
+
+Items move between lists interchangeably, three ways: drag a row onto another
+list's row, drag it anywhere onto the other list's card (lands at the end), or
+pick a destination from the row's ⋯ menu. Rules, implemented in
+`moveTaskAcrossLists` (`src/pages/Lists/utils/reorder.js`):
+
+- A parent task always brings its subtasks along.
+- A childless task dropped onto a parent or one of its children joins that
+  parent; otherwise it arrives top-level. A subtask moved to another list
+  therefore becomes a normal item there unless dropped into a sublist.
+- Top-level arrivals land *after* the block they were dropped on — never in
+  the middle of another parent's children.
+
+"Auto-delete empty lists" (a Lists setting, off by default) removes the source
+list when its last item is moved out — that is the only trigger; checking off
+items never deletes anything.
+
+## List Colors
+
+Lists store a color id (`sprout` / `honey` / `dusk` / `ember`), resolved
+through `LIST_COLORS` (`src/pages/Lists/data/listColors.js`) to `--list-*`
+tokens in `colors.css`. The set is fixed across light and dark mode so a list
+never changes identity between themes, and it was chosen to pass the
+CVD-separation and contrast checks of the dataviz palette validator on both
+surfaces (honey-600 rides the dark-mode lightness band's edge; acceptable
+because the color always appears beside the list's name). Status colors are
+never offered as list colors.
+
+## Chart Variants (Goals & Sleep widgets)
+
+The Goals check-in widget and the Sleep chart render one dataset in the form
+chosen in Settings — heatmap / bars / line for goals activity (weekly active
+days, 0–7, past year) and bars / line / heatmap for sleep (bars and line show
+the current week; the heatmap widens to four weeks). Chart idiom shared by all
+variants: one semantic hue per page (`--goal`, `--sleep`) with color-mix
+intensity ramps, thin marks, a recessive baseline, dashed goal line, native
+hover tooltips on every mark, and a Less→More legend or a plain-text caption
+naming the scale. Values and labels always use text tokens, not series colors
+(the white on-bar numbers on the sleep bars are the one pre-existing
+exception). "Week starts on" (General) reorders day labels in the heatmaps and
+weekly charts.

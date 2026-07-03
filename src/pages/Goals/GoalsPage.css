@@ -184,11 +184,100 @@
   font-size: var(--fs-body-sm);
 }
 
+/* Heatmap frame: slim day-label rail + the week grid. */
+.goals-tracker__frame {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+}
+
+.goals-tracker__days {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-rows: repeat(7, 1fr);
+  gap: 4px;
+  width: 26px;
+}
+
+.goals-tracker__day-label {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-tertiary);
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1;
+}
+
 /* Grid stretches to fill the full width of the card. */
 .goals-tracker__grid {
+  flex: 1;
+  min-width: 0;
   display: flex;
   gap: 4px;
   width: 100%;
+}
+
+/* Bar / line variants of the same weekly activity data. ------------------- */
+.goals-activity-plot {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 132px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.goals-activity-plot__col {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.goals-activity-bar {
+  display: block;
+  width: 100%;
+  background: var(--goal);
+  border-radius: 3px 3px 0 0;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+.goals-activity-plot__col:hover .goals-activity-bar {
+  opacity: 0.78;
+}
+
+.goals-activity-plot--line {
+  position: relative;
+  display: block;
+}
+
+.goals-activity-plot--line svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.goals-activity-line-dot {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--goal);
+  border: 2px solid var(--surface);
+  transform: translate(-50%, -50%);
+}
+
+.goals-activity-plot__hover {
+  position: absolute;
+  inset: 0;
+  display: flex;
+}
+
+.goals-activity-plot__hover span {
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 .goals-tracker__week {
