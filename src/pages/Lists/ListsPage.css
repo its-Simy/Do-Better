@@ -16,6 +16,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--space-4);
 }
 
 .tasks-screen__hint {
@@ -151,4 +152,15 @@
 
 .task-item-grip:disabled {
   cursor: default !important;
+}
+
+@media (max-width: 680px) {
+  .tasks-screen__toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .tasks-screen__toolbar > button {
+    width: 100%;
+  }
 }

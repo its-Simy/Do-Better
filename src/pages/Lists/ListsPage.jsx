@@ -13,7 +13,7 @@ import './ListsPage.css';
 
 /* Do Better — Lists page: separated lists, nested + checkable tasks, drag handles */
 
-export function ListsPage() {
+export function ListsPage({ onNavigate }) {
   const [filter, setFilter] = React.useState('all');
   const [draggingListId, setDraggingListId] = React.useState(null);
   const [dropTargetListId, setDropTargetListId] = React.useState(null);
@@ -64,6 +64,76 @@ export function ListsPage() {
         : { ...list, tasks: moveTaskToEnd(list.tasks, activeTaskId) }
     )));
   }, []);
+
+  const moveTaskBetweenLists = React.useCallback((sourceListId, targetListId, activeTaskId, targetTaskId = null) => {
+    if (sourceListId === targetListId) {
+      if (targetTaskId) moveTask(targetListId, activeTaskId, targetTaskId);
+      else moveTaskToListEnd(targetListId, activeTaskId);
+      return;
+    }
+
+    setLists((currentLists) => {
+      const sourceList = currentLists.find((list) => list.id === sourceListId);
+      const targetList = currentLists.find((list) => list.id === targetListId);
+      const activeTask = sourceList?.tasks.find((task) => task.id === activeTaskId);
+      if (!sourceList || !targetList || !activeTask) return currentLists;
+
+      const movingIds = new Set([activeTask.id]);
+      if (!activeTask.parent) {
+        sourceList.tasks.forEach((task) => {
+          if (task.parent === activeTask.id) movingIds.add(task.id);
+        });
+      }
+
+      const block = sourceList.tasks.filter((task) => movingIds.has(task.id));
+      const sourceTasks = sourceList.tasks.filter((task) => !movingIds.has(task.id));
+      const targetTask = targetTaskId
+        ? targetList.tasks.find((task) => task.id === targetTaskId)
+        : null;
+
+      let nextParentId = null;
+      if (!activeTask.hasChildren && targetTask) {
+        if (targetTask.parent) nextParentId = targetTask.parent;
+        else if (targetTask.hasChildren) nextParentId = targetTask.id;
+      }
+
+      const [rootTask, ...childTasks] = block;
+      const { parent, ...rootTaskWithoutParent } = rootTask;
+      const blockToMove = [
+        nextParentId ? { ...rootTask, parent: nextParentId } : rootTaskWithoutParent,
+        ...childTasks,
+      ];
+
+      const targetTasks = [...targetList.tasks];
+      let insertionIndex = targetTasks.length;
+      if (targetTask) {
+        const targetIndex = targetTasks.findIndex((task) => task.id === targetTask.id);
+        insertionIndex = targetIndex + 1;
+        while (
+          insertionIndex < targetTasks.length
+          && targetTasks[insertionIndex].parent === targetTask.id
+        ) {
+          insertionIndex += 1;
+        }
+      }
+
+      targetTasks.splice(insertionIndex, 0, ...blockToMove);
+
+      return currentLists.map((list) => {
+        if (list.id === sourceListId) {
+          return { ...list, tasks: sourceTasks };
+        }
+        if (list.id === targetListId) {
+          return {
+            ...list,
+            collapsed: nextParentId ? { ...list.collapsed, [nextParentId]: false } : list.collapsed,
+            tasks: targetTasks,
+          };
+        }
+        return list;
+      });
+    });
+  }, [moveTask, moveTaskToListEnd]);
 
   const startListDrag = (event, listId) => {
     const card = event.currentTarget.closest('.tasks-list-card');
@@ -138,31 +208,36 @@ export function ListsPage() {
 
   const dragOverTask = (event, listId, taskId) => {
     const activeTask = draggingTaskRef.current;
-    if (!activeTask || activeTask.listId !== listId) return;
+    if (!activeTask) return;
 
     event.preventDefault();
     event.stopPropagation();
     event.dataTransfer.dropEffect = 'move';
 
     const list = lists.find((candidate) => candidate.id === listId);
-    if (!list || !getTaskInsertionTargetId(list.tasks, activeTask.taskId, taskId)) return;
+    const targetTask = list?.tasks.find((task) => task.id === taskId);
+    if (!list || !targetTask) return;
+    if (
+      activeTask.listId === listId
+      && !getTaskInsertionTargetId(list.tasks, activeTask.taskId, taskId)
+    ) return;
 
     setDropTargetTask({ listId, taskId });
   };
 
   const dropTask = (event, listId, taskId) => {
     const activeTask = draggingTaskRef.current;
-    if (!activeTask || activeTask.listId !== listId) return;
+    if (!activeTask) return;
 
     event.preventDefault();
     event.stopPropagation();
-    moveTask(listId, activeTask.taskId, taskId);
+    moveTaskBetweenLists(activeTask.listId, listId, activeTask.taskId, taskId);
     clearTaskDragState();
   };
 
   const dragOverTaskArea = (event, listId) => {
     const activeTask = draggingTaskRef.current;
-    if (!activeTask || activeTask.listId !== listId) return;
+    if (!activeTask) return;
 
     event.preventDefault();
     event.stopPropagation();
@@ -173,11 +248,11 @@ export function ListsPage() {
 
   const dropTaskArea = (event, listId) => {
     const activeTask = draggingTaskRef.current;
-    if (!activeTask || activeTask.listId !== listId) return;
+    if (!activeTask) return;
 
     event.preventDefault();
     event.stopPropagation();
-    moveTaskToListEnd(listId, activeTask.taskId);
+    moveTaskBetweenLists(activeTask.listId, listId, activeTask.taskId);
     clearTaskDragState();
   };
 
@@ -212,7 +287,13 @@ export function ListsPage() {
       <div className="tasks-screen__content">
         <div className="tasks-screen__toolbar">
           <Segmented options={[{ value: 'all', label: 'All' }, { value: 'today', label: 'Today' }, { value: 'done', label: 'Done' }]} value={filter} onChange={setFilter} />
-          <Button variant="primary" iconLeft={<Icon name="plus" size={16} />}>New list</Button>
+          <Button
+            variant="primary"
+            iconLeft={<Icon name="plus" size={16} />}
+            onClick={() => onNavigate?.('create-list')}
+          >
+            New list
+          </Button>
         </div>
         <p className="tasks-screen__hint" id="tasks-list-reorder-status">
           <Icon name="grip" size={15} /> Lists stay separate while you arrange them.
@@ -241,6 +322,7 @@ export function ListsPage() {
               onTaskAreaDragOver={dragOverTaskArea}
               onTaskAreaDrop={dropTaskArea}
               onTaskMoveByKeyboard={moveTaskByKeyboard}
+              onAddTask={() => onNavigate?.('create-list-item')}
             />
           ))}
         </div>

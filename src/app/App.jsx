@@ -1,6 +1,6 @@
 import React from 'react';
 import { AppShell, TopBar } from '../layout/AppShell.jsx';
-import { Button, IconButton, Icon } from '../components';
+import { Button, Icon } from '../components';
 import { StartPage } from '../pages/Start/StartPage.jsx';
 import { APP_ROUTES, PRIMARY_ROUTE_IDS } from './routes.js';
 
@@ -62,16 +62,13 @@ export function App() {
         counts={{ lists: 6, goals: 3 }}
       >
         <TopBar title={route.title} subtitle={route.subtitle} actions={
-          <>
-            <IconButton label="Notifications"><Icon name="bell" size={18} /></IconButton>
-            <Button
-              variant="primary"
-              iconLeft={<Icon name="plus" size={16} />}
-              onClick={() => setActive('create')}
-            >
-              New
-            </Button>
-          </>
+          <Button
+            variant="primary"
+            iconLeft={<Icon name="plus" size={16} />}
+            onClick={() => setActive('create')}
+          >
+            New
+          </Button>
         } />
         <Screen
           onNavigate={setActive}

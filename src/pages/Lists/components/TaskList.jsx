@@ -23,6 +23,7 @@ export function TaskList({
   onTaskAreaDragOver,
   onTaskAreaDrop,
   onTaskMoveByKeyboard,
+  onAddTask,
 }) {
   const cardClass = [
     'tasks-list-card',
@@ -64,7 +65,7 @@ export function TaskList({
           >
             <Icon name="grip" size={15} />
           </button>
-          <IconButton label="Add task" size="sm"><Icon name="plus" size={16} /></IconButton>
+          <IconButton label="Add task" size="sm" onClick={onAddTask}><Icon name="plus" size={16} /></IconButton>
           <IconButton label="List options" size="sm"><Icon name="more-horizontal" size={16} /></IconButton>
         </span>
       </div>

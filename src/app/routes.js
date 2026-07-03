@@ -5,6 +5,7 @@ import { InsightsPage } from '../pages/Insights/InsightsPage.jsx';
 import { SettingsPage } from '../pages/Settings/SettingsPage.jsx';
 import { CreatePage } from '../pages/Create/CreatePage.jsx';
 import { CreateListPage } from '../pages/Create/CreateListPage.jsx';
+import { CreateListItemPage } from '../pages/Create/CreateListItemPage.jsx';
 import { CreateGoalPage } from '../pages/Create/CreateGoalPage.jsx';
 import { CreateHabitPage } from '../pages/Create/CreateHabitPage.jsx';
 
@@ -50,6 +51,12 @@ export const APP_ROUTES = {
     subtitle: 'Name it, add components, then finalize',
     icon: 'tasks',
     component: CreateListPage,
+  },
+  'create-list-item': {
+    title: 'New List Item',
+    subtitle: 'Choose a category, name the item, and set importance',
+    icon: 'tasks',
+    component: CreateListItemPage,
   },
   'create-goal': {
     title: 'New Goal',

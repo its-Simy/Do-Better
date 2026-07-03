@@ -32,6 +32,69 @@
   gap: var(--space-4);
 }
 
+.sleep-log-transition {
+  position: relative;
+  display: grid;
+  overflow: hidden;
+  transition: min-height var(--dur-base) var(--ease-out);
+}
+
+.sleep-log-transition.is-current {
+  min-height: 86px;
+}
+
+.sleep-log-transition.is-new {
+  min-height: 132px;
+}
+
+.sleep-log-panel {
+  grid-area: 1 / 1;
+  transition:
+    opacity var(--dur-base) var(--ease-out),
+    transform var(--dur-base) var(--ease-out),
+    visibility var(--dur-base) var(--ease-out);
+}
+
+.sleep-log-panel--current {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+}
+
+.sleep-log-transition.is-new .sleep-log-panel--current {
+  opacity: 0;
+  transform: translateY(-10px);
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.sleep-log-panel--new {
+  opacity: 0;
+  transform: translateY(12px);
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.sleep-log-transition.is-new .sleep-log-panel--new {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.sleep-log-form {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.sleep-log-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
 .sleep-log-field {
   flex: 1;
   display: flex;
@@ -146,14 +209,19 @@
 }
 
 .sleep-bars__value {
-  color: var(--text-secondary);
+  color: white;
   font-size: 11px;
   font-weight: 700;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.22);
 }
 
 .sleep-bars__bar {
   width: 100%;
   max-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: var(--radius-md) var(--radius-md) 4px 4px;
   background: var(--sleep);
   cursor: pointer;
@@ -167,4 +235,23 @@
   color: var(--text-tertiary);
   font-size: 11px;
   font-weight: 600;
+}
+
+@media (max-width: 820px) {
+  .sleep-log-grid,
+  .sleep-log-form {
+    grid-template-columns: 1fr;
+  }
+
+  .sleep-log-grid {
+    display: grid;
+  }
+
+  .sleep-log-transition.is-current {
+    min-height: 244px;
+  }
+
+  .sleep-log-transition.is-new {
+    min-height: 280px;
+  }
 }

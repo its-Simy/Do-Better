@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Badge, Button, StatTile, HabitRow, Icon } from '../../components';
+import { Card, Badge, Button, StatTile, HabitRow, Icon, Input } from '../../components';
 import './SleepPage.css';
 
 /* Do Better — Sleep screen: log bed/wake, weekly chart, analysis, sleep habits */
@@ -21,11 +21,12 @@ function SleepBars() {
         const short = n.h < goal;
         return (
           <div key={i} className="sleep-bars__night">
-            <span className="db-num sleep-bars__value">{n.h}</span>
             <div
               className={`db-hoverable sleep-bars__bar ${short ? 'is-short' : ''}`}
               style={{ height: `${(n.h / max) * 100}%` }}
-            />
+            >
+              <span className="db-num sleep-bars__value">{n.h}</span>
+            </div>
             <span className="sleep-bars__day">{n.d}</span>
           </div>
         );
@@ -49,25 +50,85 @@ function LogField({ icon, label, value, color }) {
 }
 
 export function SleepPage() {
+  const [logMode, setLogMode] = React.useState('current');
+  const [currentLog, setCurrentLog] = React.useState({
+    inBed: '12:18 am',
+    wokeUp: '7:05 am',
+    slept: '6h 47m',
+  });
+  const [draftLog, setDraftLog] = React.useState({
+    date: '2026-07-02',
+    inBed: '00:18',
+    wokeUp: '07:05',
+  });
   const [habits, setHabits] = React.useState([
     { name: 'No screens after 10pm', days: [true, true, true, false, true, true, true], streak: 4 },
     { name: 'In bed by 11:00pm', days: [false, true, false, true, false, true, true], streak: 2 },
   ]);
   const toggleDay = (hi, di) => setHabits((hs) => hs.map((h, i) => i !== hi ? h : { ...h, days: h.days.map((d, j) => j === di ? !d : d) }));
+  const updateDraftLog = (field) => (event) => {
+    setDraftLog((log) => ({ ...log, [field]: event.target.value }));
+  };
+  const startNewLog = () => {
+    setDraftLog({
+      date: '2026-07-02',
+      inBed: '',
+      wokeUp: '',
+    });
+    setLogMode('new');
+  };
+  const saveDraftLog = (event) => {
+    event.preventDefault();
+    setCurrentLog({
+      inBed: draftLog.inBed || 'Not set',
+      wokeUp: draftLog.wokeUp || 'Not set',
+      slept: currentLog.slept,
+    });
+    setLogMode('current');
+  };
 
   return (
     <div className="sleep-screen">
       <div className="sleep-screen__content">
         {/* Log card */}
-        <Card padding="lg" accent="var(--sleep)">
+        <Card padding="lg">
           <div className="sleep-card-header">
-            <span className="db-eyebrow">Log last night</span>
-            <Button variant="soft" size="sm" iconLeft={<Icon name="check" size={16} />}>Saved</Button>
+            <span className="db-eyebrow">{logMode === 'new' ? 'Add sleep log' : 'Log last night'}</span>
+            {logMode === 'current' && (
+              <Button
+                variant="soft"
+                size="sm"
+                iconLeft={<Icon name="plus" size={16} />}
+                onClick={startNewLog}
+              >
+                New log
+              </Button>
+            )}
           </div>
-          <div className="sleep-log-grid">
-            <LogField icon="bed" label="In bed" value="12:18 am" color="var(--sleep)" />
-            <LogField icon="sun" label="Woke up" value="7:05 am" color="var(--goal)" />
-            <LogField icon="clock" label="Slept" value="6h 47m" color="var(--brand)" />
+          <div className={`sleep-log-transition is-${logMode}`}>
+            <div className="sleep-log-panel sleep-log-panel--current">
+              <div className="sleep-log-grid">
+                <LogField icon="bed" label="In bed" value={currentLog.inBed} color="var(--sleep)" />
+                <LogField icon="sun" label="Woke up" value={currentLog.wokeUp} color="var(--goal)" />
+                <LogField icon="clock" label="Slept" value={currentLog.slept} color="var(--brand)" />
+              </div>
+            </div>
+
+            <form className="sleep-log-panel sleep-log-panel--new" onSubmit={saveDraftLog}>
+              <div className="sleep-log-form">
+                <Input label="Date" type="date" value={draftLog.date} onChange={updateDraftLog('date')} />
+                <Input label="In bed" type="time" value={draftLog.inBed} onChange={updateDraftLog('inBed')} />
+                <Input label="Woke up" type="time" value={draftLog.wokeUp} onChange={updateDraftLog('wokeUp')} />
+              </div>
+              <div className="sleep-log-actions">
+                <Button type="button" variant="ghost" size="sm" onClick={() => setLogMode('current')}>
+                  Cancel
+                </Button>
+                <Button type="submit" variant="primary" size="sm" iconLeft={<Icon name="check" size={16} />}>
+                  Save log
+                </Button>
+              </div>
+            </form>
           </div>
         </Card>
 
