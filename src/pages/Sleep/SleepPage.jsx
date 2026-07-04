@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Badge, Button, StatTile, HabitRow, Icon, Input } from '../../components';
+import { Card, Badge, Button, StatTile, Icon, Input } from '../../components';
 import { useSettings } from '../../state/SettingsContext.jsx';
 import './SleepPage.css';
 
@@ -38,9 +38,7 @@ function SleepBars({ nights, dayLetters, dayNames, goal, showGoalLine, max }) {
   return (
     <div className="sleep-bars">
       {showGoalLine && (
-        <div className="sleep-bars__goal-line" style={{ bottom: `${(goal / max) * 100}%` }}>
-          <span className="db-num sleep-bars__goal-label">goal {goal}h</span>
-        </div>
+        <div className="sleep-bars__goal-line" style={{ bottom: `${(goal / max) * 100}%` }} />
       )}
       {nights.map((hours, i) => {
         const short = hours < goal;
@@ -72,9 +70,7 @@ function SleepLine({ nights, dayLetters, dayNames, goal, showGoalLine, max }) {
     <div className="sleep-line">
       <div className="sleep-line__plot">
         {showGoalLine && (
-          <div className="sleep-bars__goal-line" style={{ bottom: `${(goal / max) * 100}%` }}>
-            <span className="db-num sleep-bars__goal-label">goal {goal}h</span>
-          </div>
+          <div className="sleep-bars__goal-line" style={{ bottom: `${(goal / max) * 100}%` }} />
         )}
         <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
           <path d={areaD} fill="color-mix(in srgb, var(--sleep) 13%, transparent)" stroke="none" />
@@ -172,11 +168,6 @@ export function SleepPage() {
     inBed: '00:18',
     wokeUp: '07:05',
   });
-  const [habits, setHabits] = React.useState([
-    { name: 'No screens after 10pm', days: [true, true, true, false, true, true, true], streak: 4 },
-    { name: 'In bed by 11:00pm', days: [false, true, false, true, false, true, true], streak: 2 },
-  ]);
-  const toggleDay = (hi, di) => setHabits((hs) => hs.map((h, i) => i !== hi ? h : { ...h, days: h.days.map((d, j) => j === di ? !d : d) }));
   const updateDraftLog = (field) => (event) => {
     setDraftLog((log) => ({ ...log, [field]: event.target.value }));
   };
@@ -257,7 +248,15 @@ export function SleepPage() {
           <Card padding="lg">
             <div className="sleep-chart-header">
               <span className="db-eyebrow">{chartType === 'heatmap' ? 'Past 4 weeks' : 'This week'}</span>
-              <Badge tone="sleep">avg {avg.toFixed(1)}h</Badge>
+              <div className="sleep-chart-header__meta">
+                {showGoalLine && chartType !== 'heatmap' && (
+                  <span className="sleep-goal-key">
+                    <span className="sleep-goal-key__dash" aria-hidden="true" />
+                    goal {goalHours}h
+                  </span>
+                )}
+                <Badge tone="sleep">avg {avg.toFixed(1)}h</Badge>
+              </div>
             </div>
             {chartType === 'line' && (
               <SleepLine nights={thisWeek} dayLetters={dayLetters} dayNames={dayNames} goal={goalHours} showGoalLine={showGoalLine} max={max} />
@@ -289,15 +288,6 @@ export function SleepPage() {
           </div>
         </div>
 
-        {/* Sleep habits */}
-        <Card padding="lg">
-          <span className="db-eyebrow">Sleep habits</span>
-          <div className="sleep-habits">
-            {habits.map((h, i) => (
-              <HabitRow key={h.name} name={h.name} days={h.days} streak={h.streak} accent="var(--sleep)" onToggleDay={(di) => toggleDay(i, di)} />
-            ))}
-          </div>
-        </Card>
       </div>
     </div>
   );

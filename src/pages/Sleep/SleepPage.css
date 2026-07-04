@@ -165,13 +165,6 @@
   color: var(--text-primary);
 }
 
-.sleep-habits {
-  margin-top: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
 .sleep-bars {
   position: relative;
   height: 180px;
@@ -185,17 +178,31 @@
   position: absolute;
   left: 0;
   right: 0;
-  border-top: 1.5px dashed var(--sleep);
-  opacity: 0.5;
+  border-top: 1.5px dashed color-mix(in srgb, var(--sleep) 55%, transparent);
 }
 
-.sleep-bars__goal-label {
-  position: absolute;
-  top: -16px;
-  right: 0;
+/* The goal label lives in the chart header as a legend key, never inside the
+ * plot, so no data point can ever overlap it — whatever the values. */
+.sleep-chart-header__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.sleep-goal-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   color: var(--sleep);
-  font-size: 10px;
+  font-size: var(--fs-caption);
   font-weight: 700;
+  white-space: nowrap;
+}
+
+.sleep-goal-key__dash {
+  width: 16px;
+  flex: 0 0 auto;
+  border-top: 1.5px dashed color-mix(in srgb, var(--sleep) 70%, transparent);
 }
 
 .sleep-bars__night {

@@ -143,7 +143,10 @@ the current week; the heatmap widens to four weeks). Chart idiom shared by all
 variants: one semantic hue per page (`--goal`, `--sleep`) with color-mix
 intensity ramps, thin marks, a recessive baseline, dashed goal line, native
 hover tooltips on every mark, and a Less→More legend or a plain-text caption
-naming the scale. Values and labels always use text tokens, not series colors
+naming the scale. The sleep goal's text label lives in the chart header as a
+legend key (dash swatch + "goal Xh"), never floating inside the plot, so no
+data point can overlap it for any input; only the dashed line itself sits in
+the plotting area. Values and labels always use text tokens, not series colors
 (the white on-bar numbers on the sleep bars are the one pre-existing
 exception). "Week starts on" (General) reorders day labels in the heatmaps and
 weekly charts.
