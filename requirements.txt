@@ -1,0 +1,14 @@
+# This project is a Vite + React app, so dependencies are managed by npm.
+# Install everything with:
+#
+#   npm install
+#
+# Runtime dependencies:
+#   react
+#   react-dom
+#
+# Development dependencies:
+#   @vitejs/plugin-react
+#   vite
+#
+# Exact resolved versions are recorded in package-lock.json.
