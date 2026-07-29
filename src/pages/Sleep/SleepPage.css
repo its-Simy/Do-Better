@@ -90,9 +90,17 @@
 
 .sleep-log-actions {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
   gap: var(--space-3);
   margin-top: var(--space-4);
+}
+
+/* Sits opposite the buttons so a failed save reads before the retry. */
+.sleep-log-error {
+  margin-right: auto;
+  font-size: var(--fs-caption);
+  color: var(--danger);
 }
 
 .sleep-log-field {

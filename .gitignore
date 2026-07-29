@@ -11,3 +11,7 @@ dist-ssr
 
 
 .venv
+docs/design-notes.md
+
+.env
+backend/__pycache__

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, Badge, Button, StatTile, Icon, Input } from '../../components';
 import { useSettings } from '../../state/SettingsContext.jsx';
+import { createSleepLog } from './api.js';
 import './SleepPage.css';
 
 /* Do Better — Sleep screen: log bed/wake, weekly chart, analysis, sleep habits.
@@ -168,6 +169,10 @@ export function SleepPage() {
     inBed: '00:18',
     wokeUp: '07:05',
   });
+  /* The backend owns the "how long did I sleep" math, so saving is async. */
+  const [saving, setSaving] = React.useState(false);
+  const [saveError, setSaveError] = React.useState(null);
+
   const updateDraftLog = (field) => (event) => {
     setDraftLog((log) => ({ ...log, [field]: event.target.value }));
   };
@@ -177,16 +182,25 @@ export function SleepPage() {
       inBed: '',
       wokeUp: '',
     });
+    setSaveError(null);
     setLogMode('new');
   };
-  const saveDraftLog = (event) => {
+  const saveDraftLog = async (event) => {
     event.preventDefault();
-    setCurrentLog({
-      inBed: draftLog.inBed,
-      wokeUp: draftLog.wokeUp,
-      slept: currentLog.slept,
-    });
-    setLogMode('current');
+    if (!draftLog.inBed || !draftLog.wokeUp) return;
+
+    setSaving(true);
+    setSaveError(null);
+    try {
+      const slept = await createSleepLog(draftLog);
+      setCurrentLog({ inBed: draftLog.inBed, wokeUp: draftLog.wokeUp, slept });
+      setLogMode('current');
+    } catch (error) {
+      /* Keep the form open with what they typed so the save can be retried. */
+      setSaveError(error.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const dayLetters = DAY_LETTERS[weekStart] || DAY_LETTERS.monday;
@@ -232,10 +246,11 @@ export function SleepPage() {
                 <Input label="Woke up" type="time" value={draftLog.wokeUp} onChange={updateDraftLog('wokeUp')} />
               </div>
               <div className="sleep-log-actions">
-                <Button type="button" variant="ghost" size="sm" onClick={() => setLogMode('current')}>
+                {saveError && <span className="sleep-log-error">{saveError}</span>}
+                <Button type="button" variant="ghost" size="sm" onClick={() => setLogMode('current')} disabled={saving}>
                   Cancel
                 </Button>
-                <Button type="submit" variant="primary" size="sm" iconLeft={<Icon name="check" size={16} />}>
+                <Button type="submit" variant="primary" size="sm" loading={saving} iconLeft={<Icon name="check" size={16} />}>
                   Save log
                 </Button>
               </div>

@@ -1,14 +1,26 @@
-# This project is a Vite + React app, so dependencies are managed by npm.
-# Install everything with:
+# Do Better — Python backend dependencies (FastAPI + Supabase).
 #
-#   npm install
+# Frontend dependencies are managed by npm; see package.json.
+# Exact resolved JS versions are recorded in package-lock.json.
 #
-# Runtime dependencies:
-#   react
-#   react-dom
+# Setup:
+#   python -m venv .venv
+#   .venv\Scripts\Activate.ps1      # Windows (PowerShell)
+#   source .venv/bin/activate       # macOS / Linux
+#   pip install -r requirements.txt
 #
-# Development dependencies:
-#   @vitejs/plugin-react
-#   vite
-#
-# Exact resolved versions are recorded in package-lock.json.
+# Run the API:
+#   uvicorn backend.main:app --reload --port 8000
+
+# Web framework. The [standard] extra pulls in the CLI, Jinja2, python-multipart,
+# and email-validator. CORSMiddleware is included via Starlette — no extra package.
+fastapi[standard]==0.139.0
+
+# ASGI server. [standard] adds the fast httptools/uvloop event loop and watchfiles reload.
+uvicorn[standard]==0.51.0
+
+# Supabase client (wraps postgrest, auth, storage, and realtime).
+supabase==2.31.0
+
+# Loads SUPABASE_URL / SUPABASE_SECRET_KEY from .env at startup.
+python-dotenv==1.2.2
